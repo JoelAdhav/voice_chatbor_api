@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: voice-chatbot-api # Match the name you gave your service on Render
+    env: python
+    repo: https://github.com/JoelAdhav/voice_chatbor_api.git # YOUR GitHub repo URL
+    branch: main # Or your deployment branch
+    rootDir: voice_chatbot_api # Set if your code is in a subdirectory
+    plan: free # Or your desired plan
+    buildFilter: # Optional: Only rebuild if relevant files change
+      paths:
+      - voice_chatbot_api/**
+    buildCommands:
+      - apt-get update && apt-get install -y ffmpeg # Install ffmpeg
+      - pip install --upgrade pip
+      - pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION # Specify Python version (optional but recommended)
+        value: 3.11 # Or your desired version like 3.9, 3.10 etc.
+      - key: ELEVENLABS_API_KEY
+        fromSecret: true # Mark as secret
+        sync: false # Don't sync value back to yaml
+      - key: GEMINI_API_KEY
+        fromSecret: true # Mark as secret
+        sync: false # Don't sync value back to yaml
+      # Add other env vars if needed, syncing secrets is generally not recommended
